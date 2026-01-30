@@ -1,0 +1,23 @@
+[user]
+	email = donghyun.lee@betterup.co
+	name = DongHyun Lee
+[github]
+	user = donghyun.lee@betterup.co
+[push]
+	autoSetupRemote = true
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+[core]
+	excludesfile = /Users/donghyun/.gitignore_global
+	editor = cursor --wait
+[rebase]
+	autosquash = true
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

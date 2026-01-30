@@ -1,0 +1,13 @@
+reference.sh
+pr_description.md
+
+prompt_specs/
+thoughts/
+ai_docs/
+docs/ai-initiatives/
+.claude/
+CLAUDE.local.md
+worktrees/
+git-hooks/
+PRPs/
+.plans
