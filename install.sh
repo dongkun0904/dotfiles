@@ -3,9 +3,13 @@
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 link_dotfiles() {
-  # Link shell/git config to home directory
-  ln -sf "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
+  # Zsh config split:
+  #   ~/.zshenv    — env vars & secrets (NOT tracked — contains tokens)
+  #   ~/.zprofile  — tool initializers (OrbStack, rbenv, conda, NVM)
+  #   ~/.zshrc     — interactive shell (aliases, functions, prompt, completions)
+  ln -sf "$DOTFILES_DIR/.zprofile" ~/.zprofile
   ln -sf "$DOTFILES_DIR/.zshrc" ~/.zshrc
+  ln -sf "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
   ln -sf "$DOTFILES_DIR/.gitignore_global" ~/.gitignore_global
 
   # Link Claude Code user-level config
