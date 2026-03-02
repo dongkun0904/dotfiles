@@ -23,8 +23,8 @@ link_dotfiles() {
     [ -f "$script" ] && ln -sf "$script" ~/.local/bin/
   done
 
-  # Install useful CLI tools
-  npm install -g tldr
+  # Install CLI tools
+  npm install -g @anthropic-ai/claude-code tldr
 
   # Set up Git shortcuts
   git config --global alias.co checkout
