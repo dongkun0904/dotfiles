@@ -8,6 +8,7 @@ alias cldapi="unset CLAUDE_CODE_OAUTH_TOKEN && claude"
 alias cldyapi="unset CLAUDE_CODE_OAUTH_TOKEN && claude --dangerously-skip-permissions"
 alias cldsub="unset ANTHROPIC_API_KEY && claude"
 alias cldysub="unset ANTHROPIC_API_KEY && claude --dangerously-skip-permissions"
+alias csdelete="gh codespace delete"
 alias lhlogin="aws sso login && kubectl config use-context us-east-1-staging"
 alias glb="git checkout -" # last branch
 alias gcm="git checkout main && git pull" # checkout main
