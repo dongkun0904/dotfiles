@@ -13,6 +13,12 @@ link_dotfiles() {
   ln -sf "$DOTFILES_DIR/.claude/settings.json" ~/.claude/settings.json
   ln -sf "$DOTFILES_DIR/.claude/statusline-command.sh" ~/.claude/statusline-command.sh
 
+  # Link custom scripts to ~/.local/bin
+  mkdir -p ~/.local/bin
+  for script in "$DOTFILES_DIR"/bin/*; do
+    [ -f "$script" ] && ln -sf "$script" ~/.local/bin/
+  done
+
   # Install useful CLI tools
   npm install -g tldr
 

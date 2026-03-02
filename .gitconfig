@@ -21,3 +21,7 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
+[alias]
+	co = checkout
+	br = branch
+	st = status

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# Creates a GitHub Codespace on the current branch, sets up dotfiles, and SSHs in
+set -euo pipefail
+
+DOTFILES_REPO="dongkun0904/dotfiles"
+
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+  echo "Error: Not inside a git repository." >&2
+  exit 1
+fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$BRANCH" = "HEAD" ]; then
+  echo "Error: Detached HEAD state. Please checkout a branch first." >&2
+  exit 1
+fi
+
+# Auto-detect repo from git remote
+REMOTE_URL=$(git remote get-url origin 2>/dev/null || true)
+if [ -z "$REMOTE_URL" ]; then
+  echo "Error: No 'origin' remote found." >&2
+  exit 1
+fi
+
+# Extract owner/repo from SSH or HTTPS remote URLs
+REPO=$(echo "$REMOTE_URL" | sed -E 's#\.git$##' | sed -E 's#.*[:/]([^/]+/[^/]+)$#\1#')
+
+if [ -z "$REPO" ]; then
+  echo "Error: Could not parse repository from remote URL: $REMOTE_URL" >&2
+  exit 1
+fi
+
+# Use branch name as display name (truncated, sanitized)
+DISPLAY_NAME=$(echo "$BRANCH" | head -c 50 | sed 's/[^a-zA-Z0-9_-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+
+MACHINE_TYPE="${CODESPACE_MACHINE_TYPE:-largePremiumLinux}"
+RETENTION_PERIOD="${CODESPACE_RETENTION_HOURS:-24}h"
+
+echo "🚀 Creating Codespace on branch: $BRANCH" >&2
+echo "   Repo: $REPO" >&2
+echo "   Machine: $MACHINE_TYPE" >&2
+echo "   Retention: $RETENTION_PERIOD" >&2
+
+output=$(gh codespace create \
+  --repo "$REPO" \
+  --branch "$BRANCH" \
+  --display-name "$DISPLAY_NAME" \
+  --machine "$MACHINE_TYPE" \
+  --default-permissions \
+  --retention-period "$RETENTION_PERIOD" 2>&1)
+
+if [ $? -ne 0 ] || [ -z "$output" ]; then
+  echo "Error: Failed to create Codespace" >&2
+  echo "$output" >&2
+  exit 1
+fi
+
+codespace_name=$(echo "$output" | tail -1)
+
+echo "✅ Created Codespace: $codespace_name" >&2
+
+# Install dotfiles
+echo "" >&2
+echo "📦 Installing dotfiles..." >&2
+gh codespace ssh -c "$codespace_name" -- \
+  "git clone https://github.com/$DOTFILES_REPO.git ~/dotfiles 2>/dev/null && cd ~/dotfiles && bash install.sh" >&2
+
+echo "✅ Dotfiles installed" >&2
+
+# SSH into the codespace
+echo "" >&2
+echo "🔗 Connecting to Codespace..." >&2
+gh codespace ssh -c "$codespace_name"
