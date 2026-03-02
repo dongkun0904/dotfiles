@@ -1,0 +1,2 @@
+# Override global gitignore to track .claude/ in this repo
+!.claude/
