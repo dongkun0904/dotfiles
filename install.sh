@@ -24,7 +24,8 @@ link_dotfiles() {
   done
 
   # Install CLI tools
-  npm install -g @anthropic-ai/claude-code tldr
+  command -v claude >/dev/null || npm install -g @anthropic-ai/claude-code
+  npm install -g tldr
 
   # Set up Git shortcuts
   git config --global alias.co checkout
