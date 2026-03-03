@@ -27,6 +27,11 @@ link_dotfiles() {
   command -v claude >/dev/null || npm install -g @anthropic-ai/claude-code
   npm install -g tldr
 
+  # Set default shell to zsh (for codespaces)
+  if [ -x "$(command -v zsh)" ] && [ "$SHELL" != "$(command -v zsh)" ]; then
+    sudo chsh -s "$(command -v zsh)" "$(whoami)" 2>/dev/null || true
+  fi
+
   # Set up Git shortcuts
   git config --global alias.co checkout
   git config --global alias.br branch
