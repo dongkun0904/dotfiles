@@ -3,12 +3,11 @@
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 link_dotfiles() {
-  # Zsh config split:
-  #   ~/.zshenv    — env vars & secrets (NOT tracked — contains tokens)
-  #   ~/.zprofile  — tool initializers (OrbStack, rbenv, conda, NVM)
-  #   ~/.zshrc     — interactive shell (aliases, functions, prompt, completions)
-  ln -sf "$DOTFILES_DIR/.zprofile" ~/.zprofile
-  ln -sf "$DOTFILES_DIR/.zshrc" ~/.zshrc
+  # Clean up old zsh symlinks
+  rm -f ~/.zprofile ~/.zshrc
+
+  # Shell config (bash for codespace compatibility)
+  ln -sf "$DOTFILES_DIR/.bashrc" ~/.bashrc
   ln -sf "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
   ln -sf "$DOTFILES_DIR/.gitignore_global" ~/.gitignore_global
 
@@ -26,11 +25,6 @@ link_dotfiles() {
   # Install CLI tools
   command -v claude >/dev/null || npm install -g @anthropic-ai/claude-code
   npm install -g tldr
-
-  # Set default shell to zsh (for codespaces)
-  if [ -x "$(command -v zsh)" ] && [ "$SHELL" != "$(command -v zsh)" ]; then
-    sudo chsh -s "$(command -v zsh)" "$(whoami)" 2>/dev/null || true
-  fi
 
   # Set up Git shortcuts
   git config --global alias.co checkout

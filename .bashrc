@@ -36,8 +36,7 @@ alias aws_staging_console='kp exec -it $(kubectl get pods | grep "^betterup-app-
 
 # Work helpers
 startwork () {
-  if (( $# == 0 ))
-  then
+  if [ $# -eq 0 ]; then
     echo "usage: startwork <issue-id-num> <branch-name>"
     echo "e.g. startwork 40209 add-send-notification-column"
   else
@@ -45,39 +44,3 @@ startwork () {
     git checkout main && git pull && git checkout -b BUAPP-$1/$2
   fi
 }
-
-# Prompt — region-aware
-setopt prompt_subst
-if [[ ! "$PROMPT" == *'${REGION_COLOR}${SHELL_PROFILE}'* ]]; then
-  ORIGINAL_PROMPT=$PROMPT
-  PROMPT='${REGION_COLOR}${SHELL_PROFILE} '
-  PROMPT+="${ORIGINAL_PROMPT}"
-fi
-
-function betterup-arn:aws:eks:us() {
-export REGION_COLOR=""
-export SHELL_PROFILE="Betterup ARN:AWS:EKS:US"
-  alias keast-1-staging='kubectl --context arn:aws:eks:us-east-1:315816552451:cluster/us-east-1-staging'
-  alias keast-1-production='kubectl --context arn:aws:eks:us-east-1:954965609557:cluster/us-east-1-production'
-}
-
-function betterup-eu() {
-export REGION_COLOR="%{%B%F{026}%}"
-export SHELL_PROFILE="Betterup EU"
-  alias kprod='kubectl --context eu-central-1-production'
-  alias kstag='kubectl --context eu-central-1-staging'
-}
-
-function betterup-us() {
-export REGION_COLOR="%{%B%F{197}%}"
-export SHELL_PROFILE="Betterup US"
-  alias kdev='kubectl --context us-east-1-dev'
-  alias kpre='kubectl --context us-east-1-pre-production'
-  alias kprod='kubectl --context us-east-1-production'
-  alias kstag='kubectl --context us-east-1-staging'
-}
-
-# Docker CLI completions
-fpath=(/Users/donghyun/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
