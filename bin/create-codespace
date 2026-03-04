@@ -72,7 +72,7 @@ echo "✅ Dotfiles installed" >&2
 if [ -d "$AI_WORKBENCH_LOCAL/dh_lee/.claude" ]; then
   echo "" >&2
   echo "📦 Copying ai-workbench Claude extensions..." >&2
-  tar -czf - -C "$AI_WORKBENCH_LOCAL/dh_lee" .claude | \
+  COPYFILE_DISABLE=1 tar -czf - -C "$AI_WORKBENCH_LOCAL/dh_lee" .claude | \
     gh codespace ssh -c "$codespace_name" -- \
       "mkdir -p ~/ai-workbench/dh_lee && tar -xzf - -C ~/ai-workbench/dh_lee && \
        cd ~/dotfiles && bash install.sh link-ai-workbench ~/ai-workbench" >&2
