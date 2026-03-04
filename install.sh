@@ -43,9 +43,9 @@ link_dotfiles() {
   if [ "${CODESPACES:-}" = "true" ]; then
     git config --global core.excludesfile ~/.gitignore_global
     git config --global core.editor "code --wait"
-    git config --global credential.https://github.com.helper ""
+    git config --global --unset-all credential.https://github.com.helper || true
     git config --global credential.https://github.com.helper "!/.codespaces/bin/gitcredential_github.sh"
-    git config --global credential.https://gist.github.com.helper ""
+    git config --global --unset-all credential.https://gist.github.com.helper || true
     git config --global credential.https://gist.github.com.helper "!/.codespaces/bin/gitcredential_github.sh"
   fi
 
