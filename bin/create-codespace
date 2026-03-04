@@ -3,6 +3,7 @@
 set -euo pipefail
 
 DOTFILES_REPO="dongkun0904/dotfiles"
+AI_WORKBENCH_LOCAL="${AI_WORKBENCH_PATH:-$HOME/Desktop/repo/ai-workbench}"
 
 if ! git rev-parse --is-inside-work-tree &>/dev/null; then
   echo "Error: Not inside a git repository." >&2
@@ -42,17 +43,17 @@ echo "   Repo: $REPO" >&2
 echo "   Machine: $MACHINE_TYPE" >&2
 echo "   Retention: $RETENTION_PERIOD" >&2
 
-output=$(gh codespace create \
+DEVCONTAINER_PATH="${CODESPACE_DEVCONTAINER_PATH:-.devcontainer/devcontainer.json}"
+
+if ! output=$(gh codespace create \
   --repo "$REPO" \
   --branch "$BRANCH" \
   --display-name "$DISPLAY_NAME" \
   --machine "$MACHINE_TYPE" \
   --default-permissions \
-  --retention-period "$RETENTION_PERIOD" 2>&1)
-
-if [ $? -ne 0 ] || [ -z "$output" ]; then
+  --devcontainer-path "$DEVCONTAINER_PATH" \
+  --retention-period "$RETENTION_PERIOD") || [ -z "$output" ]; then
   echo "Error: Failed to create Codespace" >&2
-  echo "$output" >&2
   exit 1
 fi
 
@@ -60,13 +61,27 @@ codespace_name=$(echo "$output" | tail -1)
 
 echo "✅ Created Codespace: $codespace_name" >&2
 
-# Install dotfiles
+# Install dotfiles (shell config, git config, CLI tools)
 echo "" >&2
 echo "📦 Installing dotfiles..." >&2
 gh codespace ssh -c "$codespace_name" -- \
   "git clone https://github.com/$DOTFILES_REPO.git ~/dotfiles 2>/dev/null && cd ~/dotfiles && bash install.sh" >&2
-
 echo "✅ Dotfiles installed" >&2
+
+# Copy ai-workbench Claude commands/agents/skills from local machine
+if [ -d "$AI_WORKBENCH_LOCAL/dh_lee/.claude" ]; then
+  echo "" >&2
+  echo "📦 Copying ai-workbench Claude extensions..." >&2
+  tar -czf - -C "$AI_WORKBENCH_LOCAL/dh_lee" .claude | \
+    gh codespace ssh -c "$codespace_name" -- \
+      "mkdir -p ~/ai-workbench/dh_lee && tar -xzf - -C ~/ai-workbench/dh_lee && \
+       cd ~/dotfiles && bash install.sh link-ai-workbench ~/ai-workbench" >&2
+  echo "✅ AI workbench extensions installed" >&2
+else
+  echo "" >&2
+  echo "⚠️  Skipping ai-workbench: $AI_WORKBENCH_LOCAL not found locally" >&2
+  echo "   Set AI_WORKBENCH_PATH to override" >&2
+fi
 
 # SSH into the codespace
 echo "" >&2
