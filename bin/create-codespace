@@ -29,6 +29,9 @@ else
     --machine "$MACHINE" \
     --devcontainer-path "$DEVCONTAINER")
   echo "Codespace created: $CODESPACE_NAME"
+  echo "Pulling latest main..."
+  gh codespace ssh -c "$CODESPACE_NAME" -- \
+    "cd /workspaces/betterup-monolith && git pull origin main" || true
   echo "Creating local branch '$BRANCH'..."
   gh codespace ssh -c "$CODESPACE_NAME" -- \
     "cd /workspaces/betterup-monolith && git checkout -b '$BRANCH'" || true
