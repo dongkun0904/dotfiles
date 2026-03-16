@@ -11,3 +11,4 @@ worktrees/
 git-hooks/
 PRPs/
 .plans
+.vscode/

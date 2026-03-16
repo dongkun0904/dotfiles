@@ -25,3 +25,5 @@
 	co = checkout
 	br = branch
 	st = status
+[fetch]
+	prune = true
