@@ -9,6 +9,7 @@ Personal development environment configuration for macOS and GitHub Codespaces.
 | `.bashrc` | Shell aliases for Git, Claude Code CLI, Kubernetes, AWS |
 | `.gitconfig` | Git settings, credential helpers, editor config |
 | `.gitignore_global` | Global ignore patterns (IDE files, AI docs, worktrees) |
+| `bin/` | Utility scripts installed to `~/.local/bin` |
 | `.claude/` | Claude Code extensions — commands, agents, skills, settings |
 | `install.sh` | Setup script that deploys everything |
 
@@ -25,7 +26,8 @@ The install script:
 1. **Appends `.bashrc`** — adds aliases to `~/.bashrc` between markers (idempotent)
 2. **Copies `.gitconfig`** — installs to `~/.gitconfig`, adjusting paths for Codespaces if needed
 3. **Copies `.gitignore_global`** — installs to `~/.gitignore_global`
-4. **Copies `.claude/` extensions** — if `../betterup-monolith` exists, copies commands/agents/skills there (additive, no-clobber)
+4. **Copies `bin/` scripts** — installs to `~/.local/bin` (creates directory if needed)
+5. **Copies `.claude/` extensions** — if `../betterup-monolith` exists, copies commands/agents/skills there (additive, no-clobber)
 
 ### Codespace Support
 
@@ -59,6 +61,14 @@ When running inside a GitHub Codespace, `install.sh` automatically:
 | `gca` | `git commit --all` |
 | `gp` | `git push` |
 | `gl` | `git log --oneline -20` |
+
+## Scripts
+
+Installed to `~/.local/bin/`:
+
+| Script | Description |
+|---|---|
+| `create-codespace` | Creates a GitHub Codespace for betterup-monolith on a given branch, sets up dotfiles, and connects via SSH |
 
 ## Claude Code Extensions
 

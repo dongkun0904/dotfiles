@@ -28,7 +28,13 @@ sed -i 's|!/opt/homebrew/bin/gh auth git-credential|!/.codespaces/bin/gitcredent
 echo ".gitignore_global: copying"
 cp "$DOTFILES_DIR/.gitignore_global" ~/.gitignore_global
 
-# ---------- Section 4: Additive copy of .claude/ to betterup-monolith ----------
+# ---------- Section 4: Copy bin/ scripts ----------
+echo "bin: copying scripts to ~/.local/bin"
+mkdir -p ~/.local/bin
+cp "$DOTFILES_DIR/bin/"* ~/.local/bin/
+chmod +x ~/.local/bin/*
+
+# ---------- Section 5: Additive copy of .claude/ to betterup-monolith ----------
 MONOLITH_DIR="$DOTFILES_DIR/../betterup-monolith"
 if [ ! -d "$MONOLITH_DIR" ]; then
   echo ".claude: WARNING — betterup-monolith not found at $MONOLITH_DIR, skipping"
