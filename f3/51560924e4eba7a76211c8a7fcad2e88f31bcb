@@ -1,0 +1,25 @@
+README.md
+  s_8c9acb3bacb628::t_1acac10050ae16 3,5,8,11-12,14-18,20,22,24-26,28,30-32
+zsh/aliases.zsh
+  s_8c9acb3bacb628::t_900018473ba9b0 1-30
+install.sh
+  s_8c9acb3bacb628::t_a21ca5f190e325 1-20,22,25-34,38
+claude/statusline-command.sh
+  s_8c9acb3bacb628::t_c23d8f253fec70 1-4,8-13,16,18-19,21-22,24-25,27-42,45-53,55,57-64,66,68-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f351560924e4eba7a76211c8a7fcad2e88f31bcb",
+  "prompts": {},
+  "sessions": {
+    "s_8c9acb3bacb628": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8615a90e-f4e5-4f18-8be5-2d8cc954252c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DongHyun Lee <donghyun.lee@betterup.co>"
+    }
+  }
+}
