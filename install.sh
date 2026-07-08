@@ -6,9 +6,9 @@ set -eu
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# --- Claude Code status line -------------------------------------------------
-# Copy the script and merge (not overwrite) the statusLine block into the
-# user-global settings, preserving keys DevPod manages (e.g. auto mode).
+# --- Claude Code status line + defaults --------------------------------------
+# Copy the script and merge (not overwrite) settings into the user-global
+# config, preserving keys DevPod manages (e.g. auto mode).
 mkdir -p "$HOME/.claude"
 cp "$DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 chmod +x "$HOME/.claude/statusline-command.sh"
@@ -16,10 +16,13 @@ chmod +x "$HOME/.claude/statusline-command.sh"
 f="$HOME/.claude/settings.json"
 [ -s "$f" ] || echo '{}' > "$f"
 if command -v jq >/dev/null 2>&1; then
-  jq '.statusLine = {"type":"command","command":"sh ~/.claude/statusline-command.sh"}' \
+  jq '.statusLine = {"type":"command","command":"sh ~/.claude/statusline-command.sh"}
+      | .model = "fable"
+      | .effortLevel = "high"
+      | .alwaysThinkingEnabled = true' \
     "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 else
-  echo "WARN: jq not found; statusLine not added to settings.json" >&2
+  echo "WARN: jq not found; statusLine/model defaults not added to settings.json" >&2
 fi
 
 # --- Shell aliases -----------------------------------------------------------
