@@ -1,6 +1,10 @@
+# Shell aliases synced into DevPod workspaces via install.sh.
+# Laptop-only / internal-infra aliases (kubectl, helm, aws sso) intentionally excluded.
+
 # Claude Code
 alias cld="claude"
 alias cldy="claude --dangerously-skip-permissions"
+alias cldyf="claude --dangerously-skip-permissions --model fable"
 alias cldyo="claude --dangerously-skip-permissions --model opus"
 alias cldys="claude --dangerously-skip-permissions --model sonnet"
 alias cldyh="claude --dangerously-skip-permissions --model haiku"
@@ -24,23 +28,3 @@ alias gcafix="git add . && git commit --fixup $1"
 alias gcamend="git commit --amend"
 alias greset="git reset HEAD --hard"
 alias gpfwl="git push origin --force-with-lease"
-
-# Codespace
-alias csdelete="gh codespace delete"
-
-# AWS / Kubernetes
-alias lhlogin="aws sso login && kubectl config use-context us-east-1-staging"
-alias kp="kubectl --context=${US_STAGING_CONTEXT} "
-alias aws_login="aws sso login --profile staging_us"
-alias aws_staging_console='kp exec -it $(kubectl get pods | grep "^betterup-app-web-" | head -n 1 | awk "{print \$1}") -- bin/rails c'
-
-# Work helpers
-startwork () {
-  if [ $# -eq 0 ]; then
-    echo "usage: startwork <issue-id-num> <branch-name>"
-    echo "e.g. startwork 40209 add-send-notification-column"
-  else
-    echo "Starting working branch"
-    git checkout main && git pull && git checkout -b BUAPP-$1/$2
-  fi
-}
