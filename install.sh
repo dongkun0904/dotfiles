@@ -1,66 +1,41 @@
-#!/bin/bash
-set -euo pipefail
-DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+#!/bin/sh
+# Run automatically by DevPod when DOTFILES_URL points at this repo
+# (set via: bin/dpod options set DOTFILES_URL=https://github.com/dongkun0904/dotfiles).
+# Safe to re-run manually inside a pod: cd ~/dotfiles && git pull && ./install.sh
+set -eu
 
-# ---------- Section 1: Append .bashrc ----------
-MARKER="# >>> dotfiles .bashrc >>>"
-if grep -qF "$MARKER" ~/.bashrc 2>/dev/null; then
-  echo ".bashrc: dotfiles block already present, skipping"
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# --- Claude Code status line + defaults --------------------------------------
+# Copy the script and merge (not overwrite) settings into the user-global
+# config, preserving keys DevPod manages (e.g. auto mode).
+mkdir -p "$HOME/.claude"
+cp "$DIR/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
+chmod +x "$HOME/.claude/statusline-command.sh"
+
+f="$HOME/.claude/settings.json"
+[ -s "$f" ] || echo '{}' > "$f"
+if command -v jq >/dev/null 2>&1; then
+  jq '.statusLine = {"type":"command","command":"sh ~/.claude/statusline-command.sh"}
+      | .model = "fable"
+      | .effortLevel = "high"
+      | .alwaysThinkingEnabled = true' \
+    "$f" > "$f.tmp" && mv "$f.tmp" "$f"
 else
-  echo ".bashrc: appending dotfiles block"
-  {
-    echo ""
-    echo "$MARKER"
-    cat "$DOTFILES_DIR/.bashrc"
-    echo "# <<< dotfiles .bashrc <<<"
-  } >> ~/.bashrc
-fi
-source ~/.bashrc || true
-
-# ---------- Section 2: Copy .gitconfig with codespace fixes ----------
-echo ".gitconfig: copying and applying codespace fixes"
-cp "$DOTFILES_DIR/.gitconfig" ~/.gitconfig
-sed -i "s|/Users/donghyun/.gitignore_global|$HOME/.gitignore_global|g" ~/.gitconfig
-sed -i 's|cursor --wait|code --wait|g' ~/.gitconfig
-sed -i 's|!/opt/homebrew/bin/gh auth git-credential|!/.codespaces/bin/gitcredential_github.sh|g' ~/.gitconfig
-
-# ---------- Section 3: Copy .gitignore_global ----------
-echo ".gitignore_global: copying"
-cp "$DOTFILES_DIR/.gitignore_global" ~/.gitignore_global
-
-# ---------- Section 4: Copy bin/ scripts ----------
-echo "bin: copying scripts to ~/.local/bin"
-mkdir -p ~/.local/bin
-cp "$DOTFILES_DIR/bin/"* ~/.local/bin/
-chmod +x ~/.local/bin/*
-
-# ---------- Section 5: Additive copy of .claude/ to betterup-monolith ----------
-MONOLITH_DIR="$DOTFILES_DIR/../betterup-monolith"
-if [ ! -d "$MONOLITH_DIR" ]; then
-  echo ".claude: WARNING — betterup-monolith not found at $MONOLITH_DIR, skipping"
-else
-  echo ".claude: copying to betterup-monolith (additive, no-clobber)"
-  TARGET="$MONOLITH_DIR/.claude"
-
-  # Create directory structure
-  mkdir -p "$TARGET/agents" "$TARGET/commands" "$TARGET/skills"
-
-  # Copy top-level files (no-clobber)
-  for f in "$DOTFILES_DIR/.claude/"*.json "$DOTFILES_DIR/.claude/"*.sh; do
-    [ -f "$f" ] && cp -n "$f" "$TARGET/" 2>/dev/null || true
-  done
-
-  # Copy subdirectories: agents/*, commands/*, skills/*
-  for category in agents commands skills; do
-    for subdir in "$DOTFILES_DIR/.claude/$category"/*/; do
-      [ -d "$subdir" ] || continue
-      dirname="$(basename "$subdir")"
-      mkdir -p "$TARGET/$category/$dirname"
-      cp -rn "$subdir"* "$TARGET/$category/$dirname/" 2>/dev/null || true
-    done
-  done
-
-  echo ".claude: done"
+  echo "WARN: jq not found; statusLine/model defaults not added to settings.json" >&2
 fi
 
-echo "Dotfiles installed successfully!"
+# --- Shell aliases -----------------------------------------------------------
+# Symlink so `git pull && ./install.sh` picks up changes. The ~/.dpod_aliases
+# name and sourcing guard match the old dpod-start sync, so pods provisioned
+# either way stay idempotent.
+if [ -f "$DIR/zsh/aliases.zsh" ]; then
+  ln -sf "$DIR/zsh/aliases.zsh" "$HOME/.dpod_aliases"
+  for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+    [ -f "$rc" ] || touch "$rc"
+    grep -qsF '.dpod_aliases' "$rc" || \
+      echo '[ -f ~/.dpod_aliases ] && . ~/.dpod_aliases' >> "$rc"
+  done
+fi
+
+echo "dotfiles installed."
